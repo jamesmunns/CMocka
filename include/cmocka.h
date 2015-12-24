@@ -63,6 +63,9 @@ int __stdcall IsDebuggerPresent();
 # endif
 #endif
 
+/*
+ * INTEGER TYPE DEFINITIONS
+ */
 #ifdef DOXYGEN
 /**
  * Largest integral type.  This type should be large enough to hold any
@@ -132,6 +135,33 @@ typedef uintmax_t LargestIntegralType;
 /* Perform a cast of a pointer to LargestIntegralType */
 #define cast_ptr_to_largest_integral_type(value) \
 cast_to_largest_integral_type(cast_to_pointer_integral_type(value))
+
+/**
+ * FLOATING POINT TYPE DEFINITIONS
+ */
+#ifdef DOXYGEN
+/**
+ * Largest floating point type.  This type should be large enough to hold any
+ * floating point type supported by the compiler.
+ *
+ * AJM - No support yet for intelligent float/double detection, or quad types
+ *   introduced by IEEE 754:2008
+ */
+typedef double LargestFloatingType;
+#else /* DOXGEN */
+#ifndef LargestFloatingType
+# define LargestFloatingType double
+#endif /* LargestFloatingType */
+#endif /* DOXYGEN */
+
+/* Printf format used to display LargestFloatingType. */
+#ifndef LargestFloatingTypePrintfFormat
+# define LargestFloatingTypePrintfFormat "%f"
+#endif /* LargestFloatingTypePrintfFormat */
+
+/* Perform a cast to LargestIntegralType. */
+#define cast_to_largest_floating_type(value) \
+    ((LargestFloatingType)(value))
 
 /* GCC have printf type attribute check.  */
 #ifdef __GNUC__
@@ -1171,6 +1201,55 @@ void assert_int_not_equal(int a, int b);
 
 #ifdef DOXYGEN
 /**
+ * @brief Assert that the two given floating point numbers are equal within a
+ *  given tolerance.
+ *
+ * The function prints an error message to standard error and terminates the
+ * test by calling fail() if the floating point numbers are not equal.
+ *
+ * @param[in]  a  The first floating point number to compare.
+ *
+ * @param[in]  b  The floating point number to compare against the first one.
+ *
+ * @param[in]  tolerance  A floating point number representing the acceptable
+ *                        variance between a and b
+ */
+void assert_floating_equal(int a, int b);
+#else
+#define assert_floating_equal(a, b) \
+    _assert_floating_equal(cast_to_largest_floating_type(a), \
+                           cast_to_largest_floating_type(b), \
+                           cast_to_largest_floating_type(tolerance), \
+                           __FILE__, __LINE__)
+#endif
+
+#ifdef DOXYGEN
+/**
+ * @brief Assert that the two given floating point numbers are not equal.
+ *
+ * The function prints an error message to standard error and terminates the
+ * test by calling fail() if the floating point numbers are equal.
+ *
+ * @param[in]  a  The first floating point number to compare.
+ *
+ * @param[in]  b  The floating point number to compare against the first one.
+ *
+ * @param[in]  tolerance  A floating point number representing the acceptable
+ *                        variance between a and b
+ *
+ * @see assert_floating_equal()
+ */
+void assert_floating_not_equal(int a, int b);
+#else
+#define assert_floating_not_equal(a, b) \
+    _assert_floating_not_equal(cast_to_largest_floating_type(a), \
+                               cast_to_largest_floating_type(b), \
+                               cast_to_largest_floating_type(tolerance), \
+                               __FILE__, __LINE__)
+#endif
+
+#ifdef DOXYGEN
+/**
  * @brief Assert that the two given strings are equal.
  *
  * The function prints an error message to standard error and terminates the
@@ -2158,6 +2237,14 @@ void _assert_int_equal(
     const char * const file, const int line);
 void _assert_int_not_equal(
     const LargestIntegralType a, const LargestIntegralType b,
+    const char * const file, const int line);
+void _assert_floating_equal(
+    const LargestFloatingType a, const LargestFloatingType b,
+    const LargestFloatingType tolerance,
+    const char * const file, const int line);
+void _assert_floating_not_equal(
+    const LargestFloatingType a, const LargestFloatingType b,
+    const LargestFloatingType tolerance,
     const char * const file, const int line);
 void _assert_string_equal(const char * const a, const char * const b,
                           const char * const file, const int line);

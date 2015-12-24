@@ -997,7 +997,8 @@ void _expect_function_call(
 }
 
 /* Returns 1 if the specified values are equal.  If the values are not equal
- * an error is displayed and 0 is returned. */
+ * an error is displayed and 0 is returned.
+ */
 static int values_equal_display_error(const LargestIntegralType left,
                                       const LargestIntegralType right) {
     const int equal = left == right;
@@ -1010,13 +1011,52 @@ static int values_equal_display_error(const LargestIntegralType left,
 
 /*
  * Returns 1 if the specified values are not equal.  If the values are equal
- * an error is displayed and 0 is returned. */
+ * an error is displayed and 0 is returned.
+ */
 static int values_not_equal_display_error(const LargestIntegralType left,
                                           const LargestIntegralType right) {
     const int not_equal = left != right;
     if (!not_equal) {
         cm_print_error(LargestIntegralTypePrintfFormat " == "
                        LargestIntegralTypePrintfFormat "\n", left, right);
+    }
+    return not_equal;
+}
+
+
+/* Returns 1 if the specified floating point numbers are equal within a given
+ * tolerance.  If the floating point numbers are not equal an error is
+ * displayed and 0 is returned.
+ *
+ * Tolerance is inclusive.
+ */
+static int floating_equal_display_error(const LargestFloatingType left,
+                                        const LargestFloatingType right,
+                                        const LargestFloatingType tolerance) {
+    const int equal = ( left - right ) <= tolerance;
+    if (!equal) {
+        cm_print_error(LargestFloatingType " != "
+                       LargestFloatingType " (tolerance: "
+                       LargestFloatingType ")\n", left, right, tolerance);
+    }
+    return equal;
+}
+
+/*
+ * Returns 1 if the specified floating point numbers are not equal within a
+ * given tolerance.  If the floating point numbers are equal an error is
+ * displayed and 0 is returned.
+ *
+ * Tolerance is inclusive.
+ */
+static int floating_not_equal_display_error(const LargestFloatingType left,
+                                            const LargestFloatingType right,
+                                            const LargestFloatingType tolerance) {
+    const int not_equal = ( left - right ) > tolerance;
+    if (!not_equal) {
+        cm_print_error(LargestFloatingType " == "
+                       LargestFloatingType " (tolerance: "
+                       LargestFloatingType ")\n", left, right, tolerance);
     }
     return not_equal;
 }
@@ -1588,6 +1628,23 @@ void _assert_int_not_equal(
         const LargestIntegralType a, const LargestIntegralType b,
         const char * const file, const int line) {
     if (!values_not_equal_display_error(a, b)) {
+        _fail(file, line);
+    }
+}
+
+void _assert_floating_equal(
+        const LargestFloatingType a, const LargestFloatingType b,
+        const LargestFloatingType tolerance,
+        const char * const file, const int line) {
+    if (!floating_equal_display_error(a, b)) {
+        _fail(file, line);
+    }
+}
+void _assert_floating_not_equal(
+        const LargestFloatingType a, const LargestFloatingType b,
+        const LargestFloatingType tolerance,
+        const char * const file, const int line) {
+    if (!floating_not_equal_display_error(a, b)) {
         _fail(file, line);
     }
 }
