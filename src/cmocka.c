@@ -1636,15 +1636,16 @@ void _assert_floating_equal(
         const LargestFloatingType a, const LargestFloatingType b,
         const LargestFloatingType tolerance,
         const char * const file, const int line) {
-    if (!floating_equal_display_error(a, b)) {
+    if (!floating_equal_display_error(a, b, tolerance)) {
         _fail(file, line);
     }
 }
+
 void _assert_floating_not_equal(
         const LargestFloatingType a, const LargestFloatingType b,
         const LargestFloatingType tolerance,
         const char * const file, const int line) {
-    if (!floating_not_equal_display_error(a, b)) {
+    if (!floating_not_equal_display_error(a, b, tolerance)) {
         _fail(file, line);
     }
 }
